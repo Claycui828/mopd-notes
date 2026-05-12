@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Agent · RL & OPD Recent Research (2026 Q1-Q2)</title>
+<style>
+:root {
+  --ivory: #FAF9F5;
+  --slate: #141413;
+  --clay: #D97757;
+  --oat: #E3DACC;
+  --olive: #788C5D;
+  --gray-100: #F0EEE6;
+  --gray-300: #D1CFC5;
+  --gray-500: #87867F;
+  --gray-700: #3D3D3A;
+  --white: #FFFFFF;
+  --serif: ui-serif, Georgia, serif;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-panel: 12px;
+  --radius-row: 8px;
+  --border: 1.5px solid var(--gray-300);
+  --info: #5C7CA3;
+  --warning: #C78E3F;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  padding: 56px 24px 96px;
+  background: var(--ivory);
+  color: var(--slate);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--slate); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--clay); }
+.page { max-width: 1180px; margin: 0 auto; }
+.eyebrow, .chip, .label, th, .date, .mini { font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.eyebrow { color: var(--gray-500); font-size: 12px; margin-bottom: 10px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 500; letter-spacing: -0.01em; margin: 0; }
+h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.02; max-width: 920px; }
+h2 { font-size: 28px; margin-bottom: 14px; }
+h3 { font-size: 22px; margin: 14px 0 10px; line-height: 1.22; }
+p { margin: 0 0 14px; color: var(--gray-700); }
+.hero { border-bottom: var(--border); padding-bottom: 34px; margin-bottom: 44px; }
+.subtitle { font-size: 18px; color: var(--gray-700); max-width: 840px; margin-top: 18px; }
+.meta-row, .card-top, .links, .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.meta-row { margin-top: 22px; }
+.chip { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 8px; border-radius: 999px; border: var(--border); background: var(--gray-100); font-size: 11px; color: var(--gray-700); }
+.cat-reward { background: rgba(217,119,87,.18); border-color: rgba(217,119,87,.44); }
+.cat-pipeline { background: rgba(92,124,163,.16); border-color: rgba(92,124,163,.42); }
+.cat-verifier { background: rgba(132,100,156,.14); border-color: rgba(132,100,156,.38); }
+.cat-data { background: rgba(120,140,93,.16); border-color: rgba(120,140,93,.40); }
+.cat-scaling { background: rgba(80,150,158,.15); border-color: rgba(80,150,158,.38); }
+.cat-opd { background: rgba(227,218,204,.80); border-color: var(--gray-300); }
+.metric-missing { background: var(--gray-100); color: var(--gray-500); border-style: dashed; }
+.section { margin: 56px 0; }
+.intro-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) 320px; gap: 28px; align-items: start; }
+.panel, .paper-card, .callout, .metric-card { background: var(--white); border: var(--border); border-radius: var(--radius-panel); padding: 22px; }
+.callout { border-left: 4px solid var(--clay); }
+.metric-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 22px; }
+.metric-card b { font-family: var(--serif); font-size: 28px; font-weight: 500; display: block; }
+.metric-card span { color: var(--gray-500); font-size: 13px; }
+.toc { position: sticky; top: 16px; }
+.toc button { display: block; width: 100%; text-align: left; padding: 8px 0; border: 0; border-bottom: 1px solid var(--gray-300); border-radius: 0; background: transparent; font-family: var(--sans); font-size: 14px; letter-spacing: 0; text-transform: none; }
+.paper-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.paper-card { transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+.paper-card:hover { transform: translateY(-2px); border-color: var(--clay); background: #fffdfa; }
+.card-top { justify-content: space-between; }
+.date { color: var(--gray-500); font-size: 12px; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.field-grid div { background: var(--gray-100); border-radius: var(--radius-row); padding: 10px; border: 1px solid var(--gray-300); }
+.field-grid span, .label { display: block; color: var(--gray-500); font-size: 11px; margin-bottom: 4px; }
+.field-grid p { margin: 0; font-size: 13px; }
+.contrib { margin: 12px 0; }
+ol { margin: 6px 0 12px 20px; padding: 0; color: var(--gray-700); }
+li { margin: 5px 0; }
+.links a { border: var(--border); border-radius: 999px; padding: 5px 9px; font-family: var(--mono); font-size: 12px; text-decoration: none; background: var(--ivory); }
+.links a:hover { border-color: var(--clay); }
+.definition { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.muted-box { background: var(--gray-100); border: var(--border); border-radius: var(--radius-panel); padding: 18px; color: var(--gray-700); }
+.gray-tags span { display: inline-block; margin: 4px 5px 4px 0; padding: 5px 8px; background: #eceae3; border: 1px dashed var(--gray-300); border-radius: 999px; color: var(--gray-500); font-family: var(--mono); font-size: 11px; text-transform: uppercase; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--white); border: var(--border); border-radius: var(--radius-panel); overflow: hidden; }
+th { background: var(--gray-100); color: var(--gray-500); font-size: 11px; text-align: left; padding: 10px; }
+td { border-top: 1px solid var(--gray-300); padding: 11px 10px; vertical-align: top; font-size: 13px; color: var(--gray-700); }
+td:first-child { color: var(--slate); font-weight: 600; min-width: 220px; }
+.table-wrap { overflow-x: auto; border-radius: var(--radius-panel); }
+.timeline { list-style: none; padding: 0; margin: 0; border-left: 1.5px solid var(--gray-300); }
+.timeline li { position: relative; padding: 0 0 16px 22px; margin: 0; }
+.timeline li::before { content: ""; position: absolute; left: -5px; top: 7px; width: 9px; height: 9px; border-radius: 999px; background: var(--clay); }
+.timeline span { display: block; font-family: var(--mono); color: var(--gray-500); font-size: 12px; }
+.timeline strong { display: block; font-family: var(--serif); font-weight: 500; }
+.timeline em { font-style: normal; color: var(--gray-500); font-size: 13px; }
+.cross-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.open-questions { counter-reset: q; display: grid; gap: 14px; }
+.question { position: relative; padding-left: 54px; }
+.question::before { counter-increment: q; content: counter(q); position: absolute; left: 18px; top: 18px; width: 24px; height: 24px; border-radius: 999px; border: var(--border); display: grid; place-items: center; font-family: var(--mono); color: var(--clay); }
+.refs { columns: 2; list-style: none; margin: 0; padding: 0; }
+.refs li { break-inside: avoid; display: flex; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--gray-300); }
+.refs span { font-family: var(--mono); color: var(--gray-500); font-size: 12px; }
+.note { font-size: 13px; color: var(--gray-500); }
+.filter-row { margin: 18px 0; }
+button { border: var(--border); background: var(--white); color: var(--slate); border-radius: 999px; padding: 8px 12px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; }
+button:hover, button.active { border-color: var(--clay); background: rgba(217,119,87,.12); }
+@media (max-width: 900px) {
+  body { padding: 28px 14px 64px; }
+  .intro-grid, .definition, .paper-grid, .cross-grid, .metric-strip { grid-template-columns: 1fr; }
+  .toc { position: static; }
+  .field-grid { grid-template-columns: 1fr; }
+  .refs { columns: 1; }
+  td, th { min-width: 160px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <div class="eyebrow">Research archive / single-file HTML / artisan report</div>
+    <h1>Code Agent · RL &amp; OPD Recent Research (2026 Q1-Q2)</h1>
+    <p class="subtitle">覆盖 2026-02-12 至 2026-05-12 的代码智能体强化学习与 On-Policy Distillation 文献：10 篇 RL 工作、9 篇 OPD 工作，以及行业脉络与证据缺口。</p>
+    <div class="meta-row">
+      <span class="chip ">updated 2026-05-12</span>
+      <span class="chip ">19 works</span>
+      <span class="chip ">no placeholder href</span>
+      <span class="chip ">OPD = On-Policy Distillation</span>
+    </div>
+  </header>
+
+  <section class="section intro-grid" id="overview">
+    <div>
+      <h2>背景导读</h2>
+      <p>过去三个月，Code Agent 相关的 RL 工作集中在两个问题上：第一，怎样把奖励从“最终测试是否通过”扩展到更可靠的执行、验证、数据合成与多阶段代理反馈；第二，怎样把训练系统从单轮代码生成迁移到多轮工具调用、延迟奖励、sandbox 执行和 test-time verification 的组合体。</p>
+      <p>这批论文里，最值得警惕的是指标证据并不均匀。部分工作给出明确数字，例如 AgentV-RL 的 +25.2%、RECRL 的 Pass@1 +1.23%-5.62%、COVERT 的 BFCL/ACEBench 改善；另一部分只给定性描述。本报告在所有 abstract 未给量化数字的条目上显示“abs 未给量化数字”，避免用前端模板补造默认百分数。</p>
+      <p>OPD 方向在本窗口高度收敛为 On-Policy Distillation：让 student 在自己生成的轨迹上接收 teacher 的稠密 token 级监督。Off-Policy Distillation 仅作为反义基线或子组件出现；Online Preference、Optimal Policy、Output Policy 等候选含义在本窗口没有被检索到独立原文。</p>
+      <div class="metric-strip">
+        <div class="metric-card"><b>10</b><span>RL works in window</span></div>
+        <div class="metric-card"><b>9</b><span>OPD works in window</span></div>
+        <div class="metric-card"><b>5</b><span>RL subcategories</span></div>
+        <div class="metric-card"><b>12</b><span>missing-metric badges</span></div>
+      </div>
+    </div>
+    <aside class="panel toc">
+      <div class="eyebrow">Contents</div>
+      <button type="button" data-jump="rl">RL direction</button>
+      <button type="button" data-jump="opd-definition">OPD definition</button>
+      <button type="button" data-jump="opd">OPD direction</button>
+      <button type="button" data-jump="cross">RL × OPD observations</button>
+      <button type="button" data-jump="facts">Basic facts table</button>
+      <button type="button" data-jump="questions">Open questions</button>
+      <button type="button" data-jump="references">References</button>
+    </aside>
+  </section>
+
+  <section class="section" id="rl">
+    <div class="eyebrow">RL direction / 5 subcategories</div>
+    <h2>强化学习方向：reward、pipeline、verifier、数据合成与 test-time scaling</h2>
+    <p class="note">子分类颜色遵循 RESULT-1：reward design 橙，training pipeline 蓝，verifier-guided 紫，数据合成 绿，inference-time scaling 青。</p>
+    <div class="paper-grid">
+<article class="paper-card" id="paper-1">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-reward">reward design</span> </div>
+    <span class="date">2026-05-01</span>
+  </div>
+  <h3>Exploring Pass-Rate Reward in Reinforcement Learning for Code Generation</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Xin-Ye Li, Ren-Biao Liu, Yun-Ji Zhang, Hui Sun, Zheng Xie, Ming Li</p></div>
+    <div><span>机构</span><p>abs 未直接列出；作者署名风格类似南京大学 LAMDA 团队，未在 abs 中确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>系统比较 pass-rate reward 与 binary pass-all-tests reward 在 critic-free RL（GRPO / RLOO）上的差异。</li><li>实证发现 pass-rate reward 虽缓解奖励稀疏，却没有可靠地优于 binary，这是对代码 RL 常见 dense reward 假设的反直觉负面结果。</li><li>给出梯度方向分析：部分通过的解会产生相互抵消的策略梯度，从而把概率质量拉离真正正确解。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>跨 base model 与算法做大规模消融；提出 miscalibrated surrogate 概念解释 dense reward 失效。报告在页面中以 reward design 橙色标签呈现，并把它作为 RL 方向的反例锚点。</p>
+  <p><span class="label">指标增益</span>N/A；负面结果论文，作者刻意不主张提升数字。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2605.02944" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-2">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-pipeline">training pipeline</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-04-03</span>
+  </div>
+  <h3>GrandCode: Achieving Grandmaster Level in Competitive Programming via Agentic Reinforcement Learning</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>DeepReinforce Team (Xiaoya Li, Xiaofei Sun, Guoyin Wang, Songqiao Su, Chris Shum, Jiwei Li)</p></div>
+    <div><span>机构</span><p>DeepReinforce（论文署名团队）</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>首个声称在 Codeforces 直播赛中稳定击败所有人类选手的 AI 系统，覆盖 Rounds 1087/1088/1089 三连冠。</li><li>采用多智能体架构：假设提议者、求解器、测试生成器、总结器，由 Agentic GRPO 联合训练。</li><li>提出针对多阶段 rollout 与延迟奖励的 Agentic GRPO 变种，处理 agent-style 多回合代码任务的信用分配。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>用 specialized sub-agent 与 delayed reward GRPO 替代单 policy；以 Gemini 3 Deep Think 此前最高第 8 名作为对比锚点。</p>
+  <p><span class="label">指标增益</span>3 场 Codeforces 直播赛第 1 名；Gemini 3 Deep Think 此前最高第 8 名。abstract 未给 SWE-bench 等通用指标。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.02721" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-3">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-pipeline">training pipeline</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-03-31</span>
+  </div>
+  <h3>Think Anywhere in Code Generation</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Xue Jiang, Tianyu Zhang, Ge Li, Mengyang Liu, Taozhi Chen, Zhenhua Xu, Binhua Li, Wenpin Jiao, Zhi Jin, Yongbin Li, Yihong Dong</p></div>
+    <div><span>机构</span><p>abs 页未直接展示；作者署名涉及北大/阿里通义系常见组合，未在 abs 直接确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>打破 upfront thinking 假设，主张代码生成复杂度会在实现过程中暴露，需要在任意 token 位置触发推理。</li><li>两阶段训练：cold-start 蒸馏学习思考模式，再用 outcome-based RL 学会何时何处思考。</li><li>在 LeetCode、LiveCodeBench、HumanEval、MBPP 四个基准上声称达到 SOTA。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>把思考建模成可学习的动态行为而非固定前缀；outcome reward 引导 think-allocation 策略。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；abstract 仅声明 SOTA across four benchmarks，未给具体数字，本报告不补造。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2603.29957" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-4">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-pipeline">training pipeline</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-03-19</span>
+  </div>
+  <h3>ProRL Agent: Rollout-as-a-Service for RL Training of Multi-Turn LLM Agents</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Hao Zhang, Mingjie Liu, Shaokun Zhang, Songyang Han, Jian Hu, Zhenghui Jin, Yuchi Zhang, Shizhe Diao, Ximing Lu, Binfeng Xu, Zhiding Yu, Jan Kautz, Yi Dong</p></div>
+    <div><span>机构</span><p>署名与 NVIDIA NeMo Gym 集成强烈指向 NVIDIA；abs 字段未显式确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>把 rollout 生成抽离成 service，将训练循环和环境交互解耦，降低 multi-turn agent RL 训练的运维复杂度。</li><li>提供 rootless HPC 环境下的标准化 sandbox，支持 SWE、数学、STEM、编码任务。</li><li>与开源 NVIDIA NeMo Gym 集成，证明在 4B/8B/14B 上对 SWE-Bench Verified 都有提升。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>Rollout-as-a-Service 是基础设施侧的工程级 RL 训练抽象，可与 verl、OpenRLHF 等框架互补。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；abstract 写 strong gains on SWE-Bench Verified across 4B/8B/14B scales，但未公布具体百分点。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2603.18815" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-5">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-pipeline">training pipeline</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-05-01</span>
+  </div>
+  <h3>Improving LLM Code Generation via Requirement-Aware Curriculum Reinforcement Learning</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Shouyu Yin, Zhao Tian, Junjie Chen, Shikai Guo</p></div>
+    <div><span>机构</span><p>abs 未直接列出；作者风格与天津大学 / 大连海事大学相关，未在 abs 字段确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>提出 Requirement Difficulty Perception，按模型自身在不同需求上的难度自适应排序样本。</li><li>提出 Requirement Optimization，把高难度需求改写成训练增益更大的提示，相当于 LLM-as-curriculum-author。</li><li>提出 Adaptive Curriculum Sampling，按训练阶段动态构造混合难度 batch，对应经典 curriculum learning。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>RL 训练前先做需求侧难度调度，把课程学习从样本级提升到任务规格级。</p>
+  <p><span class="label">指标增益</span>Pass@1 在 5 个代码生成 benchmark / 5 个 SOTA LLM 上平均提升 1.23% - 5.62%。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2605.00433" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-6">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-verifier">verifier-guided</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-04-01</span>
+  </div>
+  <h3>Execution-Verified Reinforcement Learning for Optimization Modeling</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Runda Guan, Xiangqing Shen, Jiajun Zhang, Yifan Zhang, Jian Cheng, Rui Xia</p></div>
+    <div><span>机构</span><p>abs 未直接列出；作者风格指向中科院/南理工系，未在 abs 字段确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>把数学规划求解器 Gurobi / OR-Tools / COPT 当作 deterministic verifier，让 LLM 产出求解器代码并在 sandbox 跑通。</li><li>完全 outcome-based，无需 process supervision，避免昂贵步骤标注。</li><li>支持 zero-shot solver transfer，换 backend 即可，无需重建数据集。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>用代码加真实求解器执行做奖励源，是把 RLVR 思路精确套到 OR/optimization code 任务的范例。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；abstract 称 matches or exceeds process-supervised approaches，未给具体数字。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.00442" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-7">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-verifier">verifier-guided</span> </div>
+    <span class="date">2026-04-17</span>
+  </div>
+  <h3>AgentV-RL: Scaling Reward Modeling with Agentic Verifier</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Jiazheng Zhang, Ziche Fu, Zhiheng Xi, Wenqing Jing, Mingxu Chai, Wei He, Guoqiang Zhang, Chenghao Fan, Chenxin An, Wenxiang Chen, Zhicheng Liu, Haojie Pan, Dingwei Zhu, Tao Gui, Qi Zhang, Xuanjing Huang</p></div>
+    <div><span>机构</span><p>abs 未直接列出；作者风格指向复旦/Moss 系，未在 abs 字段确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>把奖励建模本身改造成多回合、可调用工具的智能体过程，由 forward agent 和 backward agent 共同判定。</li><li>AgentV-RL 让 verifier 学会自主交错内部推理与工具调用，包含代码执行。</li><li>在 parallel 与 sequential test-time scaling 两种范式下都报告显著收益。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>把 outcome reward model 从 single-pass score 升级为 agentic verifier，对 code / tool 任务尤其友好。</p>
+  <p><span class="label">指标增益</span>4B 变体 abstract 声明超越 SOTA Outcome Reward Models 25.2%。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.16004" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-8">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-data">数据合成</span> </div>
+    <span class="date">2026-04-10</span>
+  </div>
+  <h3>COVERT: Controllable and Verifiable Tool-Use Data Synthesis for Agentic Reinforcement Learning</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Siyuan Xu, Shiyang Li, Xin Liu, Tianyi Liu, Yixiao Li, Zhan Shi, Zixuan Zhang, Zilong Wang, Qingyu Yin, Jianshu Chen, Tuo Zhao, Bing Yin</p></div>
+    <div><span>机构</span><p>abs 未直接列出</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>两阶段 pipeline：自演化生成加多层校验，得到可靠的工具调用轨迹基线。</li><li>Oracle-preserving augmentation 加入干扰工具、模糊查询、噪声工具输出，同时保留 ground-truth 答案。</li><li>用 reference matching 与 judge 自动给 reward，避免人工标注。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>将数据合成和自动 reward 做成统一可控管线，是 agentic RL 数据侧的代表工作。</p>
+  <p><span class="label">指标增益</span>Qwen2.5-Instruct-14B 上 BFCL v3 从 56.5 到 59.9，ACEBench 从 53.0 到 59.3；与 SFT 配合分别达到 62.1 / 61.8。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.09813" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-9">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-data">数据合成</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-04-07</span>
+  </div>
+  <h3>Scientific Graphics Program Synthesis via Dual Self-Consistency Reinforcement Learning</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Juekai Lin, Yun Zhu, Honglin Lin, Sijing Li, Tianwei Lin, Zheng Liu, Xiaoyang Wang, Wenqiao Zhang, Lijun Wu</p></div>
+    <div><span>机构</span><p>abs 未直接列出</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>Execution-Centric Data Engine 产出 SciTikZ-230K，覆盖 11 个学科的图像-TikZ 代码对。</li><li>SciTikZ-Bench 同时衡量视觉保真度和结构逻辑。</li><li>Dual Self-Consistency RL 用 Round-Trip Verification（代码生成、渲染、还原）作为自一致性奖励。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>把代码、可执行渲染、与原图对齐封装为 RL 奖励，是程序合成加自验证奖励的清晰范例。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；SciTikZer-8B abstract 声明持续超越 Gemini-2.5-Pro 与 Qwen3-VL-235B，未给具体数值。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.06079" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-10">
+  <div class="card-top">
+    <div><span class="chip ">RL</span> <span class="chip cat-scaling">inference-time scaling</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-03-02</span>
+  </div>
+  <h3>Tool Verification for Test-Time Reinforcement Learning</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Ruotong Liao, Nikolai Röhrich, Xiaohan Wang, Yuhui Zhang, Yasaman Samadzadeh, Volker Tresp, Serena Yeung-Levy</p></div>
+    <div><span>机构</span><p>abs 未直接列出；作者风格指向 Stanford + LMU Munich，未在 abs 字段确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>指出 Test-Time RL 的失败模式 unverified consensus，多数投票可能把一群错答聚合成自信的错。</li><li>把外部工具调用，关键是代码执行，作为额外验证信号，引入 verification-weighted voting 重排 rollout 可信度。</li><li>提出 verified online data synthesis 框架，把 TTRL 推广为带外部 verifier 的 online 合成。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>主要 benchmark 是数学，但 verification 通道直接落在代码可执行性上，可迁回纯 code-agent 场景。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；abstract 仅写 significantly improves over TTRL, with larger gains on harder problems，未给具体数字。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2603.02203" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article></div>
+  </section>
+
+  <section class="section definition" id="opd-definition">
+    <div class="callout">
+      <div class="eyebrow">Term clarification</div>
+      <h2>OPD 在本窗单义指 On-Policy Distillation</h2>
+      <p>本报告中的 OPD 仅指 On-Policy Distillation，即 student 在自己采样出的轨迹或状态上接收 teacher 的稠密监督。这一点由 2604.00626 综述、2604.13016 对应仓库 thunlp/OPD，以及本窗 9 篇相关 arXiv 工作共同支撑。</p>
+      <p>Off-Policy Distillation 在这些文献中是对照基线或 recipe 的 cold-start 子步骤，不作为 OPD 的独立活跃含义。页面中的 OPD 卡片因此按效率、稳定性、机理、代理化、多教师、RLVR 杂交等主题组织。</p>
+    </div>
+    <div class="muted-box">
+      <div class="eyebrow">Low-confidence alternatives</div>
+      <p>以下候选含义在 2026-02-12 至 2026-05-12 的 LLM / Code Agent 文献中未找到独立原文证据，使用低饱和灰显示：</p>
+      <div class="gray-tags">
+        <span>Off-Policy Distillation: baseline only</span>
+        <span>Online Preference Distillation: no in-window original</span>
+        <span>Optimal Policy Distillation: no in-window original</span>
+        <span>Output Policy Distillation: no in-window original</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="opd">
+    <div class="eyebrow">OPD direction / 6 main + 3 appendix</div>
+    <h2>On-Policy Distillation：效率、失败模式、机理与 agent 化</h2>
+    <div class="paper-grid">
+<article class="paper-card" id="paper-1">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">效率</span> </div>
+    <span class="date">2026-02-16</span>
+  </div>
+  <h3>Fast and Effective On-policy Distillation from Reasoning Prefixes</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Dongxu Zhang, Zhichao Yang, Sepehr Janghorbani, Jun Han, Andrew Ressler II, Qian Qian, Gregory D. Lyng, Sanjit Singh Batra, Robert E. Tillman</p></div>
+    <div><span>机构</span><p>arXiv abs 未明确列出隶属机构，标未确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>实证发现 OPD 训练信号高度集中在 student-rollout 的输出前缀。</li><li>提出仅对前缀施加 distillation loss，并允许采样阶段早停的简化目标。</li><li>在保持完整 OPD 性能的同时把训练 FLOP 削减 2x-47x。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>用 student 自采样轨迹但只截前缀；与 RLHF/RL 训练中的 shaped early reward 思路对偶。</p>
+  <p><span class="label">指标增益</span>训练 FLOP 2x-47x 下降，性能与 full OPD 持平。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2602.15260" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-2">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">稳定性 / 诊断</span> </div>
+    <span class="date">2026-03-26</span>
+  </div>
+  <h3>Revisiting On-Policy Distillation: Empirical Failure Modes and Simple Fixes</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Yuqian Fu, Haohuan Huang, Kaiwen Jiang, Jiacai Liu, Zhuo Jiang, Yuanheng Zhu, Dongbin Zhao</p></div>
+    <div><span>机构</span><p>abs 页未显式标注；可能来自中科院自动化所但未在 abs 直接确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>理论分析 token 级 OPD 相对序列级 reverse-KL 有偏，但方差更紧。</li><li>实证识别三种失败模式：监督不均衡、student 前缀指导不可靠、tokenizer mismatch。</li><li>提出 teacher top-K local support matching，配合 truncated reverse-KL、top-p rollout 与 special-token masking。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>把 OPD 当作 teacher 局部支撑集上的分布匹配，避免在低概率 token 上误学。</p>
+  <p><span class="label">指标增益</span>相对 vanilla sampled-token OPD baseline +19.8% 平均增益。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2603.25562" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-3">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">综述 / 定调</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-04-01</span>
+  </div>
+  <h3>A Survey of On-Policy Distillation for Large Language Models</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Mingyang Song, Mao Zheng</p></div>
+    <div><span>机构</span><p>Tencent Large Language Model Department（Hugging Face papers 页确认邮箱域）</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>本时段首篇系统综述，把在 student 自采样轨迹上做 distillation 的家族纳入统一 f-divergence 框架。</li><li>沿反馈信号、教师可达性、损失粒度三条正交维度组织 OPD 谱系。</li><li>明确把 GKD、MiniLLM、DistiLLM、SPIN、RLKD 等纳入 OPD 同一谱系，并列出 agent-level distillation 等开放问题。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>把 OPD 与 RLHF / imitation learning 联结，给出 off-policy 暴露偏差到 on-policy 修复的统一叙事。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；综述，不报告新指标。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.00626" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://huggingface.co/papers/2604.00626" target="_blank" rel="noreferrer">Hugging Face</a></div>
+</article>
+
+<article class="paper-card" id="paper-4">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">机理 / recipe</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-04-14</span>
+  </div>
+  <h3>Rethinking On-Policy Distillation of Large Language Models: Phenomenology, Mechanism, and Recipe</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Yaxuan Li, Yuxin Zuo, Bingxiang He, Jinqian Zhang, Chaojun Xiao, Cheng Qian, Tianyu Yu, Huan-ang Gao, Wenkai Yang, Zhiyuan Liu, Ning Ding</p></div>
+    <div><span>机构</span><p>abs 页未公开列出附属；GitHub 组织 thunlp 强提示 THUNLP，严格标 GitHub 组织 = thunlp</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>现象学指出成功 OPD 需要 student/teacher 思维模式兼容以及真实能力差距。</li><li>机制分析发现成功案例在 student-visited states 上对 high-probability tokens 渐进对齐，97%-99% 概率质量集中在很小的共享 token 集合。</li><li>Recipe 显示失败 OPD 可用 off-policy cold start 加 teacher-aligned prompt selection 抢救。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>基于 verl v0.7.0 复现，做了 weak-to-strong 的反向蒸馏控制；页面中把 off-policy cold start 标成 OPD 框架内部组件而非 OPD 新义。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；arXiv abs 中无量化主指标公开。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.13016" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://github.com/thunlp/OPD" target="_blank" rel="noreferrer">Code</a></div>
+</article>
+
+<article class="paper-card" id="paper-5">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">小模型 agent</span> </div>
+    <span class="date">2026-05-08</span>
+  </div>
+  <h3>SOD: Step-wise On-policy Distillation for Small Language Model Agents</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Qiyong Zhong, Mao Zheng, Mingyang Song, Xin Lin, Jie Sun, Houcheng Jiang, Xiang Wang, Junfeng Fang</p></div>
+    <div><span>机构</span><p>abs 未列；与综述同作者强提示 Tencent LLM Department，未在 abs 显式确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>针对 small LM agent 工具调用串联场景，识别多步推理中 teacher 信号被错误工具调用逐步污染的问题。</li><li>提出 SOD：在每一步根据 step-level divergence 自适应重加权 distillation 强度。</li><li>在 0.6B student 上达到 AIME 2025 26.13%，相比第二名 baseline 最大 +20.86% 绝对增益。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>在 agent 多步轨迹上做逐步信任度调权，是把 OPD 引入小模型 agent / tool-use 的代表工作。</p>
+  <p><span class="label">指标增益</span>second-best baseline 之上 +20.86%；AIME 2025 = 26.13% with 0.6B 学生。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2605.07725" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://github.com/YoungZ365/SOD" target="_blank" rel="noreferrer">Code</a></div>
+</article>
+
+<article class="paper-card" id="paper-6">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">多教师 / code</span> </div>
+    <span class="date">2026-05-02</span>
+  </div>
+  <h3>MAD-OPD: Breaking the Ceiling in On-Policy Distillation via Multi-Agent Debate</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Jianze Wang, Ying Liu, Jinlong Chen, Xuchun Hu, Qilong Zhang, Yu Cao, Jun Wang, Hua Yang, Yong Xie, Qianglong Chen</p></div>
+    <div><span>机构</span><p>abs 未显式列出，未确认机构</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>指出单 teacher 把自身错误传递给 student 是 OPD 的天花板瓶颈，MAD-OPD 把教师变成多智能体协商集合。</li><li>提出 OPAD（On-Policy Agentic Distillation），长轨迹任务上引入 step-level sampling 缓解错误累积。</li><li>提出任务自适应散度：agent 任务用 JSD，code-generation 用 reverse KL。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>组合 OPD、多智能体辩论、task-aware divergence；对代码生成和代理任务均有专门设计。</p>
+  <p><span class="label">指标增益</span>14B 到 4B 配置下相对 single-teacher OPD，agentic 平均 +2.4% / code 平均 +3.7%。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2605.01347" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://github.com/chiefovoavicii/MAD-OPD" target="_blank" rel="noreferrer">Code</a></div>
+</article>
+
+<article class="paper-card" id="paper-7">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">OPD + RLVR</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-04-03</span>
+  </div>
+  <h3>Self-Distilled RLVR</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Chenxu Yang 等</p></div>
+    <div><span>机构</span><p>research-opd 短摘未列统一机构；保持未确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>把 RLVR 的稀疏环境信号与 self-distillation 的 token 级差异结合。</li><li>RLSD 同时取得来自 RLVR 的方向稳定与来自 OPSD 的步长精细。</li><li>OPD 视角上，它把 OPD 与 RLVR 融合，用来弥补纯自蒸馏长程不稳。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>作为附录短摘呈现，归入 OPD 与 RLVR 杂交路线；强调它不是 RL 主表的重复计数。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；标 N/A。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2604.03128" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-8">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">统一框架</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-05-05</span>
+  </div>
+  <h3>Uni-OPD: Unifying On-Policy Distillation with a Dual-Perspective Recipe</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Wenjin Hou 等</p></div>
+    <div><span>机构</span><p>research-opd 短摘未列统一机构；保持未确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>同时面向 LLM 与 MLLM 的统一 OPD recipe。</li><li>提出两条数据均衡策略与 outcome-guided margin calibration。</li><li>OPD 视角上，把专家模型到单 student 的合并范式正名为 OPD。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>作为 OPD 统一框架方向补充，用低饱和分组强调其是主线外延而不是候选缩写新义。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；未给主指标数字，标 N/A。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2605.03677" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article>
+
+<article class="paper-card" id="paper-9">
+  <div class="card-top">
+    <div><span class="chip ">OPD</span> <span class="chip cat-opd">方差降低</span> <span class="chip metric-missing">abs 未给量化数字</span></div>
+    <span class="date">2026-05-08</span>
+  </div>
+  <h3>KL for a KL: On-Policy Distillation with Control Variate Baseline</h3>
+  <div class="field-grid">
+    <div><span>作者</span><p>Minjae Oh 等</p></div>
+    <div><span>机构</span><p>research-opd 短摘未列统一机构；保持未确认</p></div>
+  </div>
+  <div class="contrib">
+    <span class="label">关键贡献</span>
+    <ol><li>把 OPD 当作 policy-gradient RL，引入 RL 中常用的 control-variate baseline 得到 vOPD。</li><li>推出每 token 负 reverse-KL 的闭式 baseline，可前向一次得到。</li><li>abs 称在数学 / 科学 reasoning benchmark 上持续优于 vanilla OPD，但没有给具体数字。</li></ol>
+  </div>
+  <p><span class="label">方法亮点</span>把 OPD 与 RL 方差降低工具直接连起来，是理论化 OPD 的稳定性补充。</p>
+  <p><span class="label">指标增益</span>abs 未给量化数字；仅有定性优于 vanilla OPD 的表述。</p>
+  <div class="links"><a href="https://arxiv.org/abs/2605.07865" target="_blank" rel="noreferrer">arXiv abs</a></div>
+</article></div>
+  </section>
+
+  <section class="section" id="cross">
+    <div class="eyebrow">Synthesis</div>
+    <h2>跨方向观察：RL × OPD 的交叉点与争议</h2>
+    <div class="cross-grid">
+      <div class="panel"><h3>1. 轨迹归属正在成为核心变量</h3><p>RL 方向强调 rollout 服务化、agentic verifier、tool execution；OPD 方向强调 student-visited states。二者都在远离静态数据集范式，转向“模型实际会走到哪里，就在那里学习或验证”。</p></div>
+      <div class="panel"><h3>2. 稠密信号并不自动更好</h3><p>Pass-rate reward 的负面结果与 OPD 的 failure mode 诊断相互呼应：更密的 token 或测试信号可能带来偏差、污染或梯度抵消，必须配合支撑集匹配、步骤重加权或 verifier 可信度估计。</p></div>
+      <div class="panel"><h3>3. Code agent 的评测仍不统一</h3><p>RL 工作横跨 Codeforces、SWE-Bench Verified、BFCL、ACEBench、OR benchmarks、TikZ 程序合成；OPD 工作则多用 reasoning、AIME、agentic 和 code generation 混合指标。跨论文排序容易误导。</p></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>时间线</h3>
+      <ul class="timeline"><li><span>2026-02-16</span><strong>Fast and Effective On-policy Distillation from Reasoning Prefixes</strong><em>OPD / 效率</em></li>
+<li><span>2026-03-02</span><strong>Tool Verification for Test-Time Reinforcement Learning</strong><em>RL / inference-time scaling</em></li>
+<li><span>2026-03-19</span><strong>ProRL Agent: Rollout-as-a-Service for RL Training of Multi-Turn LLM Agents</strong><em>RL / training pipeline</em></li>
+<li><span>2026-03-26</span><strong>Revisiting On-Policy Distillation: Empirical Failure Modes and Simple Fixes</strong><em>OPD / 稳定性 / 诊断</em></li>
+<li><span>2026-03-31</span><strong>Think Anywhere in Code Generation</strong><em>RL / training pipeline</em></li>
+<li><span>2026-04-01</span><strong>Execution-Verified Reinforcement Learning for Optimization Modeling</strong><em>RL / verifier-guided</em></li>
+<li><span>2026-04-01</span><strong>A Survey of On-Policy Distillation for Large Language Models</strong><em>OPD / 综述 / 定调</em></li>
+<li><span>2026-04-03</span><strong>GrandCode: Achieving Grandmaster Level in Competitive Programming via Agentic Reinforcement Learning</strong><em>RL / training pipeline</em></li>
+<li><span>2026-04-03</span><strong>Self-Distilled RLVR</strong><em>OPD / OPD + RLVR</em></li>
+<li><span>2026-04-07</span><strong>Scientific Graphics Program Synthesis via Dual Self-Consistency Reinforcement Learning</strong><em>RL / 数据合成</em></li>
+<li><span>2026-04-10</span><strong>COVERT: Controllable and Verifiable Tool-Use Data Synthesis for Agentic Reinforcement Learning</strong><em>RL / 数据合成</em></li>
+<li><span>2026-04-14</span><strong>Rethinking On-Policy Distillation of Large Language Models: Phenomenology, Mechanism, and Recipe</strong><em>OPD / 机理 / recipe</em></li>
+<li><span>2026-04-17</span><strong>AgentV-RL: Scaling Reward Modeling with Agentic Verifier</strong><em>RL / verifier-guided</em></li>
+<li><span>2026-05-01</span><strong>Exploring Pass-Rate Reward in Reinforcement Learning for Code Generation</strong><em>RL / reward design</em></li>
+<li><span>2026-05-01</span><strong>Improving LLM Code Generation via Requirement-Aware Curriculum Reinforcement Learning</strong><em>RL / training pipeline</em></li>
+<li><span>2026-05-02</span><strong>MAD-OPD: Breaking the Ceiling in On-Policy Distillation via Multi-Agent Debate</strong><em>OPD / 多教师 / code</em></li>
+<li><span>2026-05-05</span><strong>Uni-OPD: Unifying On-Policy Distillation with a Dual-Perspective Recipe</strong><em>OPD / 统一框架</em></li>
+<li><span>2026-05-08</span><strong>SOD: Step-wise On-policy Distillation for Small Language Model Agents</strong><em>OPD / 小模型 agent</em></li>
+<li><span>2026-05-08</span><strong>KL for a KL: On-Policy Distillation with Control Variate Baseline</strong><em>OPD / 方差降低</em></li></ul>
+    </div>
+  </section>
+
+  <section class="section" id="facts">
+    <div class="eyebrow">Basic facts</div>
+    <h2>基础事实表</h2>
+    <p class="note">表格包含全部 19 篇工作，超过要求的 12 行下限；链接仅使用真实 arXiv abs、GitHub、Hugging Face 或 blog URL。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>标题</th><th>方向</th><th>日期</th><th>机构</th><th>一句话</th><th>链接</th></tr></thead>
+        <tbody><tr><td>Exploring Pass-Rate Reward in Reinforcement Learning for Code Generation</td><td>RL / reward design</td><td>2026-05-01</td><td>abs 未直接列出；作者署名风格类似南京大学 LAMDA 团队，未在 abs 中确认</td><td>系统比较 pass-rate reward 与 binary pass-all-tests reward 在 critic-free RL（GRPO / RLOO）上的差异。</td><td><a href="https://arxiv.org/abs/2605.02944" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>GrandCode: Achieving Grandmaster Level in Competitive Programming via Agentic Reinforcement Learning</td><td>RL / training pipeline</td><td>2026-04-03</td><td>DeepReinforce（论文署名团队）</td><td>首个声称在 Codeforces 直播赛中稳定击败所有人类选手的 AI 系统，覆盖 Rounds 1087/1088/1089 三连冠。</td><td><a href="https://arxiv.org/abs/2604.02721" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Think Anywhere in Code Generation</td><td>RL / training pipeline</td><td>2026-03-31</td><td>abs 页未直接展示；作者署名涉及北大/阿里通义系常见组合，未在 abs 直接确认</td><td>打破 upfront thinking 假设，主张代码生成复杂度会在实现过程中暴露，需要在任意 token 位置触发推理。</td><td><a href="https://arxiv.org/abs/2603.29957" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>ProRL Agent: Rollout-as-a-Service for RL Training of Multi-Turn LLM Agents</td><td>RL / training pipeline</td><td>2026-03-19</td><td>署名与 NVIDIA NeMo Gym 集成强烈指向 NVIDIA；abs 字段未显式确认</td><td>把 rollout 生成抽离成 service，将训练循环和环境交互解耦，降低 multi-turn agent RL 训练的运维复杂度。</td><td><a href="https://arxiv.org/abs/2603.18815" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Improving LLM Code Generation via Requirement-Aware Curriculum Reinforcement Learning</td><td>RL / training pipeline</td><td>2026-05-01</td><td>abs 未直接列出；作者风格与天津大学 / 大连海事大学相关，未在 abs 字段确认</td><td>提出 Requirement Difficulty Perception，按模型自身在不同需求上的难度自适应排序样本。</td><td><a href="https://arxiv.org/abs/2605.00433" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Execution-Verified Reinforcement Learning for Optimization Modeling</td><td>RL / verifier-guided</td><td>2026-04-01</td><td>abs 未直接列出；作者风格指向中科院/南理工系，未在 abs 字段确认</td><td>把数学规划求解器 Gurobi / OR-Tools / COPT 当作 deterministic verifier，让 LLM 产出求解器代码并在 sandbox 跑通。</td><td><a href="https://arxiv.org/abs/2604.00442" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>AgentV-RL: Scaling Reward Modeling with Agentic Verifier</td><td>RL / verifier-guided</td><td>2026-04-17</td><td>abs 未直接列出；作者风格指向复旦/Moss 系，未在 abs 字段确认</td><td>把奖励建模本身改造成多回合、可调用工具的智能体过程，由 forward agent 和 backward agent 共同判定。</td><td><a href="https://arxiv.org/abs/2604.16004" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>COVERT: Controllable and Verifiable Tool-Use Data Synthesis for Agentic Reinforcement Learning</td><td>RL / 数据合成</td><td>2026-04-10</td><td>abs 未直接列出</td><td>两阶段 pipeline：自演化生成加多层校验，得到可靠的工具调用轨迹基线。</td><td><a href="https://arxiv.org/abs/2604.09813" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Scientific Graphics Program Synthesis via Dual Self-Consistency Reinforcement Learning</td><td>RL / 数据合成</td><td>2026-04-07</td><td>abs 未直接列出</td><td>Execution-Centric Data Engine 产出 SciTikZ-230K，覆盖 11 个学科的图像-TikZ 代码对。</td><td><a href="https://arxiv.org/abs/2604.06079" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Tool Verification for Test-Time Reinforcement Learning</td><td>RL / inference-time scaling</td><td>2026-03-02</td><td>abs 未直接列出；作者风格指向 Stanford + LMU Munich，未在 abs 字段确认</td><td>指出 Test-Time RL 的失败模式 unverified consensus，多数投票可能把一群错答聚合成自信的错。</td><td><a href="https://arxiv.org/abs/2603.02203" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Fast and Effective On-policy Distillation from Reasoning Prefixes</td><td>OPD / 效率</td><td>2026-02-16</td><td>arXiv abs 未明确列出隶属机构，标未确认</td><td>实证发现 OPD 训练信号高度集中在 student-rollout 的输出前缀。</td><td><a href="https://arxiv.org/abs/2602.15260" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Revisiting On-Policy Distillation: Empirical Failure Modes and Simple Fixes</td><td>OPD / 稳定性 / 诊断</td><td>2026-03-26</td><td>abs 页未显式标注；可能来自中科院自动化所但未在 abs 直接确认</td><td>理论分析 token 级 OPD 相对序列级 reverse-KL 有偏，但方差更紧。</td><td><a href="https://arxiv.org/abs/2603.25562" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>A Survey of On-Policy Distillation for Large Language Models</td><td>OPD / 综述 / 定调</td><td>2026-04-01</td><td>Tencent Large Language Model Department（Hugging Face papers 页确认邮箱域）</td><td>本时段首篇系统综述，把在 student 自采样轨迹上做 distillation 的家族纳入统一 f-divergence 框架。</td><td><a href="https://arxiv.org/abs/2604.00626" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://huggingface.co/papers/2604.00626" target="_blank" rel="noreferrer">Hugging Face</a></td></tr>
+<tr><td>Rethinking On-Policy Distillation of Large Language Models: Phenomenology, Mechanism, and Recipe</td><td>OPD / 机理 / recipe</td><td>2026-04-14</td><td>abs 页未公开列出附属；GitHub 组织 thunlp 强提示 THUNLP，严格标 GitHub 组织 = thunlp</td><td>现象学指出成功 OPD 需要 student/teacher 思维模式兼容以及真实能力差距。</td><td><a href="https://arxiv.org/abs/2604.13016" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://github.com/thunlp/OPD" target="_blank" rel="noreferrer">Code</a></td></tr>
+<tr><td>SOD: Step-wise On-policy Distillation for Small Language Model Agents</td><td>OPD / 小模型 agent</td><td>2026-05-08</td><td>abs 未列；与综述同作者强提示 Tencent LLM Department，未在 abs 显式确认</td><td>针对 small LM agent 工具调用串联场景，识别多步推理中 teacher 信号被错误工具调用逐步污染的问题。</td><td><a href="https://arxiv.org/abs/2605.07725" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://github.com/YoungZ365/SOD" target="_blank" rel="noreferrer">Code</a></td></tr>
+<tr><td>MAD-OPD: Breaking the Ceiling in On-Policy Distillation via Multi-Agent Debate</td><td>OPD / 多教师 / code</td><td>2026-05-02</td><td>abs 未显式列出，未确认机构</td><td>指出单 teacher 把自身错误传递给 student 是 OPD 的天花板瓶颈，MAD-OPD 把教师变成多智能体协商集合。</td><td><a href="https://arxiv.org/abs/2605.01347" target="_blank" rel="noreferrer">arXiv abs</a> <a href="https://github.com/chiefovoavicii/MAD-OPD" target="_blank" rel="noreferrer">Code</a></td></tr>
+<tr><td>Self-Distilled RLVR</td><td>OPD / OPD + RLVR</td><td>2026-04-03</td><td>research-opd 短摘未列统一机构；保持未确认</td><td>把 RLVR 的稀疏环境信号与 self-distillation 的 token 级差异结合。</td><td><a href="https://arxiv.org/abs/2604.03128" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>Uni-OPD: Unifying On-Policy Distillation with a Dual-Perspective Recipe</td><td>OPD / 统一框架</td><td>2026-05-05</td><td>research-opd 短摘未列统一机构；保持未确认</td><td>同时面向 LLM 与 MLLM 的统一 OPD recipe。</td><td><a href="https://arxiv.org/abs/2605.03677" target="_blank" rel="noreferrer">arXiv abs</a></td></tr>
+<tr><td>KL for a KL: On-Policy Distillation with Control Variate Baseline</td><td>OPD / 方差降低</td><td>2026-05-08</td><td>research-opd 短摘未列统一机构；保持未确认</td><td>把 OPD 当作 policy-gradient RL，引入 RL 中常用的 control-variate baseline 得到 vOPD。</td><td><a href="https://arxiv.org/abs/2605.07865" target="_blank" rel="noreferrer">arXiv abs</a></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="questions">
+    <div class="eyebrow">Open questions</div>
+    <h2>三个开放问题</h2>
+    <div class="open-questions">
+      <div class="panel question"><h3>Verifier 的可信度如何校准？</h3><p>RL 论文越来越依赖执行器、工具调用、solver、judge 或 agentic verifier。下一步不仅要验证答案，还要估计 verifier 自身在分布外任务上的错误模式，尤其是工具输出噪声和 sandbox 差异。</p></div>
+      <div class="panel question"><h3>OPD 与 RLVR 能否共享 credit assignment？</h3><p>OPD 提供 token 级密集监督，RLVR 提供方向稳定的环境信号。Self-Distilled RLVR 与 SOD 指向一种混合路线，但如何在多步 code agent 轨迹里分配 step-level 和 token-level 权重仍未统一。</p></div>
+      <div class="panel question"><h3>哪些指标能真正代表 code agent 能力？</h3><p>Codeforces、SWE-Bench、LiveCodeBench、工具调用基准和程序合成基准测量的是不同能力。报告不做全行业 SOTA 排名，因为多数 abstract 没有公开可比数字，且任务分布差异会放大误读。</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="references">
+    <div class="eyebrow">References</div>
+    <h2>完整参考链接列表</h2>
+    <p class="note">包含所有 19 篇 arXiv abs、可证 GitHub repo、Hugging Face 论文页与行业脉络 blog / news 链接。</p>
+    <ol class="refs"><li><span>01</span><a href="https://arxiv.org/abs/2605.02944" target="_blank" rel="noreferrer">Exploring Pass-Rate Reward in Reinforcement Learning for Code Generation - arXiv abs</a></li>
+<li><span>02</span><a href="https://arxiv.org/abs/2604.02721" target="_blank" rel="noreferrer">GrandCode: Achieving Grandmaster Level in Competitive Programming via Agentic Reinforcement Learning - arXiv abs</a></li>
+<li><span>03</span><a href="https://arxiv.org/abs/2603.29957" target="_blank" rel="noreferrer">Think Anywhere in Code Generation - arXiv abs</a></li>
+<li><span>04</span><a href="https://arxiv.org/abs/2603.18815" target="_blank" rel="noreferrer">ProRL Agent: Rollout-as-a-Service for RL Training of Multi-Turn LLM Agents - arXiv abs</a></li>
+<li><span>05</span><a href="https://arxiv.org/abs/2605.00433" target="_blank" rel="noreferrer">Improving LLM Code Generation via Requirement-Aware Curriculum Reinforcement Learning - arXiv abs</a></li>
+<li><span>06</span><a href="https://arxiv.org/abs/2604.00442" target="_blank" rel="noreferrer">Execution-Verified Reinforcement Learning for Optimization Modeling - arXiv abs</a></li>
+<li><span>07</span><a href="https://arxiv.org/abs/2604.16004" target="_blank" rel="noreferrer">AgentV-RL: Scaling Reward Modeling with Agentic Verifier - arXiv abs</a></li>
+<li><span>08</span><a href="https://arxiv.org/abs/2604.09813" target="_blank" rel="noreferrer">COVERT: Controllable and Verifiable Tool-Use Data Synthesis for Agentic Reinforcement Learning - arXiv abs</a></li>
+<li><span>09</span><a href="https://arxiv.org/abs/2604.06079" target="_blank" rel="noreferrer">Scientific Graphics Program Synthesis via Dual Self-Consistency Reinforcement Learning - arXiv abs</a></li>
+<li><span>10</span><a href="https://arxiv.org/abs/2603.02203" target="_blank" rel="noreferrer">Tool Verification for Test-Time Reinforcement Learning - arXiv abs</a></li>
+<li><span>11</span><a href="https://arxiv.org/abs/2602.15260" target="_blank" rel="noreferrer">Fast and Effective On-policy Distillation from Reasoning Prefixes - arXiv abs</a></li>
+<li><span>12</span><a href="https://arxiv.org/abs/2603.25562" target="_blank" rel="noreferrer">Revisiting On-Policy Distillation: Empirical Failure Modes and Simple Fixes - arXiv abs</a></li>
+<li><span>13</span><a href="https://arxiv.org/abs/2604.00626" target="_blank" rel="noreferrer">A Survey of On-Policy Distillation for Large Language Models - arXiv abs</a></li>
+<li><span>14</span><a href="https://huggingface.co/papers/2604.00626" target="_blank" rel="noreferrer">A Survey of On-Policy Distillation for Large Language Models - Hugging Face</a></li>
+<li><span>15</span><a href="https://arxiv.org/abs/2604.13016" target="_blank" rel="noreferrer">Rethinking On-Policy Distillation of Large Language Models: Phenomenology, Mechanism, and Recipe - arXiv abs</a></li>
+<li><span>16</span><a href="https://github.com/thunlp/OPD" target="_blank" rel="noreferrer">Rethinking On-Policy Distillation of Large Language Models: Phenomenology, Mechanism, and Recipe - Code</a></li>
+<li><span>17</span><a href="https://arxiv.org/abs/2605.07725" target="_blank" rel="noreferrer">SOD: Step-wise On-policy Distillation for Small Language Model Agents - arXiv abs</a></li>
+<li><span>18</span><a href="https://github.com/YoungZ365/SOD" target="_blank" rel="noreferrer">SOD: Step-wise On-policy Distillation for Small Language Model Agents - Code</a></li>
+<li><span>19</span><a href="https://arxiv.org/abs/2605.01347" target="_blank" rel="noreferrer">MAD-OPD: Breaking the Ceiling in On-Policy Distillation via Multi-Agent Debate - arXiv abs</a></li>
+<li><span>20</span><a href="https://github.com/chiefovoavicii/MAD-OPD" target="_blank" rel="noreferrer">MAD-OPD: Breaking the Ceiling in On-Policy Distillation via Multi-Agent Debate - Code</a></li>
+<li><span>21</span><a href="https://arxiv.org/abs/2604.03128" target="_blank" rel="noreferrer">Self-Distilled RLVR - arXiv abs</a></li>
+<li><span>22</span><a href="https://arxiv.org/abs/2605.03677" target="_blank" rel="noreferrer">Uni-OPD: Unifying On-Policy Distillation with a Dual-Perspective Recipe - arXiv abs</a></li>
+<li><span>23</span><a href="https://arxiv.org/abs/2605.07865" target="_blank" rel="noreferrer">KL for a KL: On-Policy Distillation with Control Variate Baseline - arXiv abs</a></li>
+<li><span>24</span><a href="https://api-docs.deepseek.com/news/news260424" target="_blank" rel="noreferrer">DeepSeek V4 Preview official API news</a></li>
+<li><span>25</span><a href="https://www.cnbc.com/2026/04/24/deepseek-v4-llm-preview-open-source-ai-competition-china.html" target="_blank" rel="noreferrer">CNBC report on DeepSeek V4 preview</a></li></ol>
+  </section>
+</main>
+<script>
+document.querySelectorAll(".paper-card").forEach(card => {
+  card.addEventListener("click", event => {
+    if (event.target.tagName.toLowerCase() === "a") return;
+    card.classList.toggle("selected");
+  });
+});
+document.querySelectorAll("[data-jump]").forEach(button => {
+  button.addEventListener("click", () => {
+    const target = document.getElementById(button.dataset.jump);
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+});
+</script>
+</body>
+</html>
